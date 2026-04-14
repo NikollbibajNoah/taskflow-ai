@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
 
                         $task->update([
                             'sequence_number' => $index + 1,
-                            'task_number' => $project->key . '-' . ($index + 1),
+                            'task_number' => $project->key.'-'.($index + 1),
                         ]);
                     });
             });

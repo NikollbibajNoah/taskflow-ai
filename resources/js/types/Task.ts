@@ -1,5 +1,5 @@
-import { TaskStatus } from '@/types/TaskStatus';
-import { TaskPriority } from '@/types/TaskPriority';
+import type { TaskPriority } from '@/types/TaskPriority';
+import type { TaskStatus } from '@/types/TaskStatus';
 
 export type Task = {
     id: number;

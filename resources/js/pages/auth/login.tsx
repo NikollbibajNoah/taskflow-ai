@@ -2,11 +2,17 @@ import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+} from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
@@ -19,29 +25,35 @@ type Props = {
 };
 
 export default function Login({
-      status,
-      canResetPassword,
-      canRegister,
-  }: Props) {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    status,
+    canResetPassword,
+    canRegister,
+}: Props) {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     return (
         <>
             <Head title="Login" />
-            <Form
-                {...store.form()}
-                resetOnSuccess={['password']}>
+            <Form {...store.form()} resetOnSuccess={['password']}>
                 {({ processing, errors }) => (
-                    <div className="flex-1 flex items-center justify-center p-6">
+                    <div className="flex flex-1 items-center justify-center p-6">
                         <Card className="w-full max-w-md border-0 shadow-none lg:border lg:shadow-sm">
                             <CardHeader className="text-center">
-                                <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
-                                    <div className="h-8 w-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">A</div>
-                                    <span className="text-xl font-bold">acme</span>
+                                <div className="mb-4 flex items-center justify-center gap-2 lg:hidden">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
+                                        A
+                                    </div>
+                                    <span className="text-xl font-bold">
+                                        acme
+                                    </span>
                                 </div>
-                                <CardTitle className="text-xl">Welcome back</CardTitle>
-                                <CardDescription>Sign in to your account</CardDescription>
+                                <CardTitle className="text-xl">
+                                    Welcome back
+                                </CardTitle>
+                                <CardDescription>
+                                    Sign in to your account
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
@@ -54,7 +66,11 @@ export default function Login({
                                         tabIndex={1}
                                         autoComplete="email"
                                         placeholder="email@example.com"
-                                        value={email} onChange={(e) => setEmail(e.target.value)} />
+                                        value={email}
+                                        onChange={(e) =>
+                                            setEmail(e.target.value)
+                                        }
+                                    />
                                     <InputError message={errors.email} />
                                 </div>
                                 <div className="space-y-2">
@@ -65,13 +81,22 @@ export default function Login({
                                         name="password"
                                         tabIndex={2}
                                         placeholder="••••••••"
-                                        value={password} onChange={(e) => setPassword(e.target.value)} />
+                                        value={password}
+                                        onChange={(e) =>
+                                            setPassword(e.target.value)
+                                        }
+                                    />
                                     <InputError message={errors.password} />
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <Checkbox id="remember" />
-                                        <Label htmlFor="remember" className="text-sm font-normal">Remember me</Label>
+                                        <Label
+                                            htmlFor="remember"
+                                            className="text-sm font-normal"
+                                        >
+                                            Remember me
+                                        </Label>
                                     </div>
                                     <div className="flex items-center">
                                         {canResetPassword && (
@@ -97,11 +122,12 @@ export default function Login({
                                 </Button>
                                 {canRegister && (
                                     <p className="text-center text-sm text-muted-foreground">
-                                        Don't have an account?{" "}
+                                        Don't have an account?{' '}
                                         <TextLink
                                             href={register()}
                                             tabIndex={5}
-                                            className="text-primary hover:underline font-medium">
+                                            className="font-medium text-primary hover:underline"
+                                        >
                                             Sign up
                                         </TextLink>
                                     </p>

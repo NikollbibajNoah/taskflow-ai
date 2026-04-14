@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-@import "tailwindcss";
+@import 'tailwindcss';
 @import 'tw-animate-css';
 
 @plugin "tailwindcss-animate";
@@ -16,7 +16,7 @@
     --breakpoint-2xl: 1400px;
 
     /* Font */
-    --font-sans: "Inter", system-ui, sans-serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
 
     /* Border Radius */
     --radius-lg: var(--radius);
@@ -79,20 +79,40 @@
     --animate-slide-in: slide-in 0.3s ease-out;
 
     @keyframes accordion-down {
-        from { height: 0; }
-        to { height: var(--radix-accordion-content-height); }
+        from {
+            height: 0;
+        }
+        to {
+            height: var(--radix-accordion-content-height);
+        }
     }
     @keyframes accordion-up {
-        from { height: var(--radix-accordion-content-height); }
-        to { height: 0; }
+        from {
+            height: var(--radix-accordion-content-height);
+        }
+        to {
+            height: 0;
+        }
     }
     @keyframes fade-in {
-        from { opacity: 0; transform: translateY(4px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(4px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     @keyframes slide-in {
-        from { opacity: 0; transform: translateX(-8px); }
-        to { opacity: 1; transform: translateX(0); }
+        from {
+            opacity: 0;
+            transform: translateX(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 }
 
@@ -179,12 +199,12 @@
     }
 
     body {
-        @apply bg-background text-foreground font-sans antialiased;
+        @apply bg-background font-sans text-foreground antialiased;
     }
 }
 
 @layer utilities {
     .text-gradient {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-info;
+        @apply bg-gradient-to-r from-primary to-info bg-clip-text text-transparent;
     }
 }

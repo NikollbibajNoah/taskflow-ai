@@ -24,7 +24,7 @@ class TaskFactory extends Factory
         return [
             'project_id' => Project::factory(),
 
-            'task_number' => 'TMP-' . $this->faker->unique()->bothify('TMP-####??'),
+            'task_number' => 'TMP-'.$this->faker->unique()->bothify('TMP-####??'),
             'sequence_number' => $this->faker->numberBetween(1, 10000),
 
             'name' => $this->faker->randomElement([

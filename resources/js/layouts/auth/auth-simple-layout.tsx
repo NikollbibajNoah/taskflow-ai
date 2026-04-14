@@ -14,11 +14,20 @@ export default function AuthSimpleLayout({
     const { theme, toggle } = useTheme();
 
     return (
-        <div className="flex min-h-svh flex-col  gap-6 bg-background p-6 md:p-10">
-            <Button variant="ghost" size="icon" onClick={toggle} className="cursor-pointer text-muted-foreground hover:text-foreground">
-                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        <div className="flex min-h-svh flex-col gap-6 bg-background p-6 md:p-10">
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggle}
+                className="cursor-pointer text-muted-foreground hover:text-foreground"
+            >
+                {theme === 'dark' ? (
+                    <Sun className="h-4 w-4" />
+                ) : (
+                    <Moon className="h-4 w-4" />
+                )}
             </Button>
-            <div className="w-full m-auto max-w-sm">
+            <div className="m-auto w-full max-w-sm">
                 <div className="flex flex-col gap-8">
                     <div className="flex flex-col items-center gap-4">
                         <Link

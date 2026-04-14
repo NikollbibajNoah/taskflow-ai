@@ -27,7 +27,7 @@ const mainNavItems: NavItem[] = [
         title: 'Projects',
         href: projectsIndex(),
         icon: FolderKanbanIcon,
-    }
+    },
 ];
 
 const footerNavItems: NavItem[] = [
