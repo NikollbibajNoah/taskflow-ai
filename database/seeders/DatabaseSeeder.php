@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
         // 2. Create users
         $users = User::factory(5)->create();
 
-        // 3. Create projects
+        // 3. Create Projects
         Project::factory(3)
             ->create([
                 'owner_id' => $users->random()->id,

@@ -13,7 +13,8 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard, projects } from '@/routes';
+import { dashboard } from '@/routes';
+import { index as projectsIndex } from '@/routes/projects';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -24,7 +25,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Projects',
-        href: projects(),
+        href: projectsIndex(),
         icon: FolderKanbanIcon,
     }
 ];
