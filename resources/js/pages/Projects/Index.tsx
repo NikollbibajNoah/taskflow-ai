@@ -1,14 +1,34 @@
-import { Head } from '@inertiajs/react';
+import { Form, Head, router, useForm } from '@inertiajs/react';
 import { MoreHorizontal, PlusIcon } from 'lucide-react';
+import { useState } from 'react';
+import InputError from '@/components/input-error';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 // import { Progress } from '@/components/ui/progress';
-import { index as projectsIndex } from '@/routes/projects';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
+import { Textarea } from '@/components/ui/textarea';
+import { index as projectsIndex, store as projectsStore } from '@/routes/projects';
 import type { Project } from '@/types/Project';
-import type { TaskStatus } from '@/types/TaskStatus';
 
-export const statusBadge: Record<TaskStatus, string> = {
+export const statusBadge = {
     todo: 'bg-muted text-muted-foreground',
     in_progress: 'bg-blue-500/15 text-blue-600',
     review: 'bg-yellow-500/15 text-yellow-700',
@@ -18,6 +38,13 @@ export const statusBadge: Record<TaskStatus, string> = {
 type Props = {
     projects: Project[];
 };
+
+type CreateProjectFormProps = {
+    name: string;
+    description: string | undefined;
+    // key: string;
+    is_active: 'active' | 'archived';
+}
 
 const initials = (name?: string) =>
     name
@@ -29,7 +56,29 @@ const initials = (name?: string) =>
               .toUpperCase()
         : '';
 
+const initialForm: CreateProjectFormProps = {
+    name: '',
+    description: '',
+    is_active: 'active'
+};
+
 export default function Projects({ projects }: Props) {
+    const [open, setOpen] = useState<boolean>(false);
+    const { data, setData, post, processing, errors, reset } = useForm<CreateProjectFormProps>(initialForm);
+
+    const handleDialogOpen = () => {
+        setOpen(true);
+    };
+
+    const submit = () => {
+        post(projectsStore().url, {
+            onSuccess: () => {
+                setOpen(false);
+                reset();
+            }
+        });
+    };
+
     return (
         <>
             <Head title="Projects" />
@@ -45,7 +94,7 @@ export default function Projects({ projects }: Props) {
                             {projects.length} projects total
                         </p>
                     </div>
-                    <Button>
+                    <Button onClick={handleDialogOpen}>
                         <PlusIcon className="" />
                         New Project
                     </Button>
@@ -99,6 +148,54 @@ export default function Projects({ projects }: Props) {
                     ))}
                 </div>
             </div>
+
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Create new project</DialogTitle>
+                        <DialogDescription>Fill all details below to create your new project. Fields marked with <span className="text-red-500">*</span> must be filled out</DialogDescription>
+                        <DialogDescription></DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="name" mandatory>Project name</Label>
+                            <Input
+                                name="name"
+                                id="name"
+                                placeholder="Website Redesign, Mobile App etc."
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)} />
+                            <InputError message={errors.name} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="description">Description</Label>
+                            <Textarea
+                                name="description"
+                                id="description"
+                                placeholder="Few words about the project..."
+                                rows={3}
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="is_active" mandatory>Status</Label>
+                            <input type="hidden" name="is_active" value={data.is_active} />
+                            <Select name="is_active" value={data.is_active} onValueChange={(v) => setData('is_active', v as 'active' | 'archived')}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="active">Active</SelectItem>
+                                    <SelectItem value="archived">Archived</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <InputError message={errors.is_active} />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+                        <Button disabled={processing} type="button" onClick={submit}>{processing && <Spinner />}Create</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
