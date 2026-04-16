@@ -3,7 +3,7 @@
 > This project is work in progress and is not yet complete. The README will be updated as the project progresses.
 
 # TaskFlow AI
-TaskFlow AI is a project management tool (like Jira) that usees AI to manage tasks and projects for software development.
+TaskFlow AI is a project management tool (like Jira) that uses AI to manage tasks and projects for software development.
 Its main goal is to keep task and project management clean and simple, with AI integration that
 enables greater efficiency and structure. TaskFlow AI is built with **PHP Laravel** with **React (Typescript)** in a single
 stack. Communication between the backend and frontend is handled by **inertia**.
