@@ -26,8 +26,14 @@ class ProjectStoreRequest extends FormRequest
         return [
             'name' => 'required|string|max:100',
             'description' => 'nullable|string|max:255',
-//            'key' => 'required|string|max:10|alpha_dash|unique:projects,key',
+            'key' => 'required|string|max:10|alpha_dash|unique:projects,key',
             'is_active' => ['required', Rule::in(['active', 'archived'])],
         ];
+    }
+
+    protected function prepareForValidation(): void {
+        $this->merge([
+            'key' => strtoupper(trim((string) $this->input('key'))),
+        ]);
     }
 }

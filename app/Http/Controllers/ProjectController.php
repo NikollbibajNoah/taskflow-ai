@@ -19,15 +19,26 @@ class ProjectController extends Controller
         return Inertia::render('Projects/Index', compact('projects'));
     }
 
+    public function show()
+    {
+
+    }
+
     public function store(ProjectStoreRequest $request)
     {
         $data = $request->validated();
 
-        dd($data);
-//        $created = $this->projectService->create();
+        $data['owner_id'] = $request->user()->id;
 
-        return redirect()
-            ->route('projects.index')
-            ->with('success', 'Project created successfully.');
+        $data['is_active'] = ($data['is_active'] ?? 'active') === 'active';
+
+        $created = $this->projectService->create($data);
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => "Project '{$created->name}' created successfully.",
+        ]);
+
+        return redirect()->route('projects.index');
     }
 }
