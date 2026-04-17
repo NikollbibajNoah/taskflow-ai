@@ -1,3 +1,4 @@
+import type { Task } from '@/types/Task';
 import type { User } from '@/types/User';
 
 export type Project = {
@@ -12,6 +13,8 @@ export type Project = {
     key: string;
 
     is_active: boolean;
+
+    tasks: Task[];
 
     created_at: string;
     updated_at: string;

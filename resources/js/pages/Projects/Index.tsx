@@ -1,11 +1,9 @@
 import { Head, useForm } from '@inertiajs/react';
-import { MoreHorizontal, PlusIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { ProjectCard } from '@/components/projects/ProjectCard';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-// import { Progress } from '@/components/ui/progress';
 import {
     Dialog,
     DialogContent,
@@ -27,7 +25,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { index as projectsIndex, store as projectsStore } from '@/routes/projects';
 import type { Project } from '@/types/Project';
-import { ProjectCard } from '@/components/projects/ProjectCard';
+import { MainContent } from '@/components/main-content';
 
 export const statusBadge = {
     todo: 'bg-muted text-muted-foreground',
@@ -74,8 +72,7 @@ export default function Projects({ projects }: Props) {
     return (
         <>
             <Head title="Projects" />
-
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <MainContent>
                 {/*Header section*/}
                 <div className="flex items-center justify-between">
                     <div>
@@ -98,7 +95,7 @@ export default function Projects({ projects }: Props) {
                         <ProjectCard project={p} key={p.id} />
                     ))}
                 </div>
-            </div>
+            </MainContent>
 
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className="sm:max-w-md">

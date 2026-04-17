@@ -19,9 +19,34 @@ class ProjectController extends Controller
         return Inertia::render('Projects/Index', compact('projects'));
     }
 
-    public function show()
+    public function show(Request $request, Project $project)
     {
+        $tasks = $project->tasks()
+            ->with(['assignee:id,name,email'])
+            ->get();
 
+        $byStatus = $tasks->groupBy('status');
+
+        $todo = $byStatus->get('todo', collect())->values();
+        $inProgress = $byStatus->get('in_progress', collect())->values();
+        $review = $byStatus->get('review', collect())->values();
+        $done = $byStatus->get('done', collect())->values();
+
+        $total = $tasks->count();
+
+        $progress = $total > 0 ? round(($done->count() / $total) * 100) : 0;
+
+        return Inertia::render('Projects/Show', [
+            'project' => $project,
+            'tasks' => [
+                'todo' => $todo,
+                'in_progress' => $inProgress,
+                'review' => $review,
+                'done' => $done,
+                'total' => $total,
+                'progress' => $progress,
+            ],
+        ]);
     }
 
     public function store(ProjectStoreRequest $request)

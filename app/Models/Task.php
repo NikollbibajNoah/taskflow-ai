@@ -78,6 +78,11 @@ class Task extends Model
         return $query->where('status', TaskStatus::IN_PROGRESS);
     }
 
+    public function scopeReview($query)
+    {
+        return $query->where('status', TaskStatus::REVIEW);
+    }
+
     public function scopeDone($query)
     {
         return $query->where('status', TaskStatus::DONE);

@@ -1,5 +1,6 @@
 import type { TaskPriority } from '@/types/TaskPriority';
 import type { TaskStatus } from '@/types/TaskStatus';
+import type { User } from '@/types/User';
 
 export type Task = {
     id: number;
@@ -26,4 +27,8 @@ export type Task = {
     updated_at: string;
 
     deleted_at: string | null;
+};
+
+export type TaskWithAssignee = Task & {
+    assignee?: User;
 };
