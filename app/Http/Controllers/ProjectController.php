@@ -19,6 +19,10 @@ class ProjectController extends Controller
         return Inertia::render('Projects/Index', compact('projects'));
     }
 
+    public function edit(Project $project) {
+        return Inertia::render('Projects/Edit', compact('project'));
+    }
+
     public function show(Request $request, Project $project)
     {
         $tasks = $project->tasks()

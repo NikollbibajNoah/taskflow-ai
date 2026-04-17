@@ -2,6 +2,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
+import { MainContent } from '@/components/main-content';
 import { ProjectCard } from '@/components/projects/ProjectCard';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,9 +24,8 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
-import { index as projectsIndex, store as projectsStore } from '@/routes/projects';
+import { store as projectsStore } from '@/routes/projects';
 import type { Project } from '@/types/Project';
-import { MainContent } from '@/components/main-content';
 
 export const statusBadge = {
     todo: 'bg-muted text-muted-foreground',
@@ -163,8 +163,7 @@ export default function Projects({ projects }: Props) {
 Projects.layout = {
     breadcrumbs: [
         {
-            title: 'Projects',
-            href: projectsIndex(),
-        },
-    ],
-};
+            title: "Projects",
+        }
+    ]
+}

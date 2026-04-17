@@ -19,7 +19,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { initials } from '@/lib/utils';
-import { index as projectsIndex } from '@/routes/projects';
+import { index as projectsIndex, edit as projectsEdit } from '@/routes/projects';
 import type { Project } from '@/types/Project';
 import type { TaskWithAssignee } from '@/types/Task';
 import type { TaskStatus } from '@/types/TaskStatus';
@@ -84,7 +84,9 @@ export default function ProjectShow({ project, tasks }: ProjectShowProps) {
                     </div>
                     <div className="flex items-center gap-2">
                         <Button variant="outline" size="sm">
-                            <Settings />Settings
+                            <Link href={projectsEdit(project.id)} className="flex items-center gap-2">
+                                <Settings />Settings
+                            </Link>
                         </Button>
                         <Button size="sm">
                             <Plus />Add Task
@@ -231,4 +233,11 @@ export default function ProjectShow({ project, tasks }: ProjectShowProps) {
             </MainContent>
         </>
     )
+}
+
+ProjectShow.layout = {
+    breadcrumbs: [
+        { title: "Projects", href: projectsIndex() },
+        { title: "Details" }
+    ]
 }

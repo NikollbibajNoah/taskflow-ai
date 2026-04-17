@@ -18,7 +18,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { initials } from '@/lib/utils';
-import { show as ProjectShow } from '@/routes/projects';
+import { show as ProjectShow, edit as projectsEdit } from '@/routes/projects';
 import type { Project } from '@/types/Project';
 
 type ProjectCardProps = {
@@ -60,7 +60,7 @@ export const ProjectCard:React.FC<ProjectCardProps> = ({ project }) => {
                                 >
                                     <DropdownMenuGroup>
                                         <DropdownMenuItem>
-                                            <Link href={ProjectShow(project.id)} className="w-full flex items-center">
+                                            <Link href={projectsEdit(project.id)} className="w-full flex items-center">
                                                 <Pencil className="mr-2" />
                                                 Edit
                                             </Link>
