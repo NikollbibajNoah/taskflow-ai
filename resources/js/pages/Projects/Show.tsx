@@ -1,7 +1,9 @@
-import { Link } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
+import { format } from "date-fns";
 import {
     AlertCircle,
     ArrowLeft,
+    CalendarIcon,
     CheckCircle2,
     Clock,
     FileText,
@@ -9,19 +11,34 @@ import {
     Plus,
     Settings,
 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import InputError from '@/components/input-error';
 import { MainContent } from '@/components/main-content';
 import { TaskCard } from '@/components/TaskCard';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/Calendar';
 import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { initials } from '@/lib/utils';
+import { Textarea } from '@/components/ui/textarea';
+import { cn, initials } from '@/lib/utils';
+import { store as projectTasksStore } from '@/routes/project/tasks';
 import { index as projectsIndex, edit as projectsEdit } from '@/routes/projects';
 import type { Project } from '@/types/Project';
 import type { TaskWithAssignee } from '@/types/Task';
+import type { TaskPriority } from '@/types/TaskPriority';
 import type { TaskStatus } from '@/types/TaskStatus';
 
 type StatusColumn = {
@@ -47,7 +64,28 @@ type ProjectShowProps = {
     tasks: TasksPayload;
 }
 
+type CreateTaskFormProps = {
+    name: string;
+    description: string;
+    status: TaskStatus;
+    priority: TaskPriority;
+    due_date: Date | null;
+    assigned_to: number | null;
+}
+
 export default function ProjectShow({ project, tasks }: ProjectShowProps) {
+    const [openTaskDialog, setOpenTaskDialog] = useState<boolean>(false);
+
+    const initalFormData: CreateTaskFormProps = {
+        name: '',
+        description: '',
+        status: 'todo',
+        priority: 'medium',
+        due_date: null,
+        assigned_to: 1,
+    };
+
+    const { data, setData, post, processing, errors, reset } = useForm<CreateTaskFormProps>(initalFormData);
 
     const projectTasks = useMemo<TaskWithAssignee[]>(() => {
         return [
@@ -57,6 +95,15 @@ export default function ProjectShow({ project, tasks }: ProjectShowProps) {
             ...tasks.done,
         ];
     }, [tasks]);
+
+    const submit = () => {
+        post(projectTasksStore({ project: project.id }).url, {
+            onSuccess: () => {
+                setOpenTaskDialog(false);
+                reset();
+            }
+        });
+    }
 
     return(
         <>
@@ -88,11 +135,118 @@ export default function ProjectShow({ project, tasks }: ProjectShowProps) {
                                 <Settings />Settings
                             </Link>
                         </Button>
-                        <Button size="sm">
+                        <Button size="sm" onClick={() => setOpenTaskDialog(true)}>
                             <Plus />Add Task
                         </Button>
                     </div>
                 </div>
+
+                <Dialog open={openTaskDialog} onOpenChange={setOpenTaskDialog}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Create new Task</DialogTitle>
+                            <DialogDescription>Fill all details below to create your new task. Fields marked with <span className="text-red-500">*</span> must be filled out</DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-2">
+                            <div className="space-y-2">
+                                <Label mandatory>Name</Label>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    placeholder="Integrate AI-Solution..."
+                                    value={data.name}
+                                    onChange={(e) => setData('name', e.target.value)}
+                                />
+                                <InputError message={errors.name} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Description</Label>
+                                <Textarea
+                                    id="description"
+                                    name="description"
+                                    cols={20}
+                                    value={data.description}
+                                    onChange={(e) => setData('description', e.target.value)}
+                                />
+                                <InputError message={errors.description} />
+                            </div>
+                            {/*<div className="space-y-2 w-1/2">*/}
+                            {/*    <Label>Assigned Person</Label>*/}
+                            {/*    <input type="hidden" name="assigned_to" value={data.assigned_to} />*/}
+                            {/*    <Select name="assigned_to" value={data.assigned_to}>*/}
+                            {/*        <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>*/}
+                            {/*        <SelectContent>*/}
+                            {/*            <SelectItem value="1">1 (Me)</SelectItem>*/}
+                            {/*        </SelectContent>*/}
+                            {/*    </Select>*/}
+                            {/*    <InputError message={errors.assigned_to} />*/}
+                            {/*</div>*/}
+                            <div className="space-y-2 w-1/2">
+                                <Label>Status</Label>
+                                <input type="hidden" name="status" value={data.status} />
+                                <Select name="status" value={data.status} onValueChange={(v) => setData('status', v as TaskStatus)}>
+                                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="todo">To Do</SelectItem>
+                                        <SelectItem value="in_progress">In Progress</SelectItem>
+                                        <SelectItem value="review">Review</SelectItem>
+                                        <SelectItem value="done">Done</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <InputError message={errors.status} />
+                            </div>
+                            <div className="space-y-2 w-1/2">
+                                <Label>Priority</Label>
+                                <input type="hidden" name="priority" value={data.priority} />
+                                <Select name="priority" value={data.priority} onValueChange={(v) => setData('priority', v as TaskPriority)}>
+                                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="low">Low</SelectItem>
+                                        <SelectItem value="medium">Medium</SelectItem>
+                                        <SelectItem value="high">High</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <InputError message={errors.priority} />
+                            </div>
+                            <div className="space-y-2 w-1/2">
+                                <Label>Due date</Label>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                        variant="outline"
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !data.due_date && "text-muted-foreground",
+                                        )}>
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {data.due_date ? (
+                                                format(data.due_date, "PPP")
+                                            ) : (
+                                                <span>Select date</span>
+                                            )}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={data.due_date ?? undefined}
+                                            fromDate={new Date()}
+                                            onSelect={(d) => setData('due_date', d ?? null)}
+                                            initialFocus
+
+                                            className={cn("p-3 pointer-events-auto")}
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                                <InputError message={errors.priority} />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setOpenTaskDialog(false)}>Cancel</Button>
+                            <Button disabled={processing} type="button" onClick={submit}>{processing && <Spinner />}Create</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

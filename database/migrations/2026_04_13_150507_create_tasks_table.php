@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('project_id')
-                ->constrained('Projects')->cascadeOnDelete();
+                ->constrained('projects')->cascadeOnDelete();
 
             $table->string('task_number')->unique(); // Task
             $table->integer('sequence_number');
