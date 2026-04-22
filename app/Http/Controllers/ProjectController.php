@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProjectDestroyRequest;
 use App\Http\Requests\ProjectStoreRequest;
 use App\Models\Project;
 use App\Services\ProjectService;
@@ -66,6 +67,20 @@ class ProjectController extends Controller
         Inertia::flash('toast', [
             'type' => 'success',
             'message' => "Project '{$created->name}' created successfully.",
+        ]);
+
+        return redirect()->route('projects.index');
+    }
+
+    public function destroy(ProjectDestroyRequest $request, Project $project)
+    {
+        $request->validated();
+
+        $project->delete();
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => "Project '{$project->name}' deleted successfully.",
         ]);
 
         return redirect()->route('projects.index');

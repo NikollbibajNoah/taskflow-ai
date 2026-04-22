@@ -1,6 +1,7 @@
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import InputError from '@/components/input-error';
 import { MainContent } from '@/components/main-content';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,12 +12,23 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription, DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import {
     show as projectsShow,
     index as projectsIndex,
+    destroy as projectsDestroy
 } from '@/routes/projects';
 import type { Project } from '@/types/Project';
 
@@ -31,11 +43,25 @@ type Section = {
 
 const sections: Section[] = [
     { id: "general", label: "General" },
-    // { id: "danger", label: "Danger Zone" },
+    { id: "danger", label: "Danger Zone" },
 ];
 
+type DeleteConfirmationProps = {
+    name: string;
+}
+
 export default function ProjectEdit({ project }: ProjectEditProps) {
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
     const [active, setActive] = useState<string>("general");
+    const { data, setData, delete: destroy, processing, errors } = useForm<DeleteConfirmationProps>({ name: ''});
+
+    const submit = () => {
+        destroy(projectsDestroy({ project: project.id }).url, {
+            onSuccess: () => {
+                setDeleteDialogOpen(false);
+            }
+        });
+    }
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -117,7 +143,7 @@ export default function ProjectEdit({ project }: ProjectEditProps) {
                     </aside>
 
                     {/* Sections */}
-                    <div ref={containerRef} className="space-y-8 max-w-3xl">
+                    <div ref={containerRef} className="space-y-16 max-w-3xl">
                         {/* General */}
                         <section id="general" className="scroll-mt-24 space-y-4">
                             <Card>
@@ -153,8 +179,72 @@ export default function ProjectEdit({ project }: ProjectEditProps) {
                                 </CardFooter>
                             </Card>
                         </section>
+
+                        <Separator />
+
+                        {/* Danger Zone */}
+                        <section id="danger" className="scroll-mt-24">
+                            <Card className="border-destructive/40">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-destructive">
+                                        <AlertTriangle className="size-6" /> Danger Zone
+                                    </CardTitle>
+                                    <CardDescription>
+                                        These actions are permanent and cannot be undone.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div>
+                                            <p className="text-sm font-medium">Delete project</p>
+                                            <p className="text-xs text-muted-foreground">
+                                                Permanently delete this project and all of its data.
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <Button
+                                                variant="destructive"
+                                                onClick={() => setDeleteDialogOpen(true)}
+                                            >Delete</Button>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </section>
                     </div>
                 </div>
+
+                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Delete <b>{project.name}</b></DialogTitle>
+                            <DialogDescription>Are You sure to delete this project? This action cannot be undone</DialogDescription>
+                        </DialogHeader>
+                        <div className="p-4">
+                            <div className="space-y-2">
+                                <div>
+                                    <Label>To delete this project type: <b>{project.name}</b></Label>
+
+                                </div>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    onChange={(e) => setData('name', e.target.value)}
+                                    value={data.name}
+                                />
+                                <InputError message={errors.name} />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+                            <Button
+                                disabled={processing || data.name.trim() !== project.name}
+                                variant="destructive"
+                                type="button"
+                                onClick={submit} >{processing && <Spinner />}Delete</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
 
             </MainContent>
         </>

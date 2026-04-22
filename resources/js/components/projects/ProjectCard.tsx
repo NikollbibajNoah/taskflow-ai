@@ -3,7 +3,6 @@ import {
     Archive,
     MoreHorizontal,
     Pencil,
-    Trash,
 } from 'lucide-react';
 import React from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -14,7 +13,6 @@ import {
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { initials } from '@/lib/utils';
@@ -72,13 +70,6 @@ export const ProjectCard:React.FC<ProjectCardProps> = ({ project }) => {
                                     {/*        Archive*/}
                                     {/*    </DropdownMenuItem>*/}
                                     {/*</DropdownMenuGroup>*/}
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuGroup>
-                                        <DropdownMenuItem className="text-red-500">
-                                            <Trash className="mr-2 text-inherit" />
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuGroup>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
