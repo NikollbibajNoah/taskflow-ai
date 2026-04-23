@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -18,8 +19,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 
-    Route::post('/projects/{project}/tasks', [\App\Http\Controllers\TaskController::class, 'store'])->name('project.tasks.store');
-
+    // Tasks
+    Route::scopeBindings()->group(function () {
+        Route::get('/projects/{project}/tasks/{task}', [TaskController::class, 'show'])->name('projects.tasks.show');
+        Route::post('/projects/{project}/tasks',[TaskController::class, 'store'])->name('projects.tasks.store');
+    });
 });
 
 require __DIR__.'/settings.php';

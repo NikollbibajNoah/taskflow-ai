@@ -14,7 +14,8 @@ import {
 import { useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
 import { MainContent } from '@/components/main-content';
-import { TaskCard } from '@/components/TaskCard';
+import { ProjectTasksDisplay } from '@/components/projects/ProjectTasksDisplay';
+import { TaskCard } from '@/components/projects/tasks/TaskCard';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -31,28 +32,14 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { cn, initials } from '@/lib/utils';
-import { store as projectTasksStore } from '@/routes/project/tasks';
+import { cn } from '@/lib/utils';
 import { index as projectsIndex, edit as projectsEdit } from '@/routes/projects';
+import { store as projectsTasksStore } from '@/routes/projects/tasks';
 import type { Project } from '@/types/Project';
 import type { TaskWithAssignee } from '@/types/Task';
 import type { TaskPriority } from '@/types/TaskPriority';
 import type { TaskStatus } from '@/types/TaskStatus';
-
-type StatusColumn = {
-    key: TaskStatus;
-    title: string;
-    color: string;
-};
-
-const statusColumns: StatusColumn[] = [
-    { key: "todo", title: "To Do", color: "bg-muted-foreground" },
-    { key: "in_progress", title: "In Progress", color: "bg-info" },
-    { key: "review", title: "Review", color: "bg-warning" },
-    { key: "done", title: "Done", color: "bg-success" },
-];
 
 type TasksPayload = Record<TaskStatus, TaskWithAssignee[]> & {
     total: number;
@@ -62,6 +49,7 @@ type TasksPayload = Record<TaskStatus, TaskWithAssignee[]> & {
 type ProjectShowProps = {
     project: Project;
     tasks: TasksPayload;
+    modalTask?: TaskWithAssignee;
 }
 
 type CreateTaskFormProps = {
@@ -87,7 +75,7 @@ export default function ProjectShow({ project, tasks }: ProjectShowProps) {
 
     const { data, setData, post, processing, errors, reset } = useForm<CreateTaskFormProps>(initalFormData);
 
-    const projectTasks = useMemo<TaskWithAssignee[]>(() => {
+    const projectTasks: TaskWithAssignee[] = useMemo<TaskWithAssignee[]>(() => {
         return [
             ...tasks.todo,
             ...tasks.in_progress,
@@ -97,7 +85,7 @@ export default function ProjectShow({ project, tasks }: ProjectShowProps) {
     }, [tasks]);
 
     const submit = () => {
-        post(projectTasksStore({ project: project.id }).url, {
+        post(projectsTasksStore({ project: project.id }).url, {
             onSuccess: () => {
                 setOpenTaskDialog(false);
                 reset();
@@ -170,17 +158,6 @@ export default function ProjectShow({ project, tasks }: ProjectShowProps) {
                                 />
                                 <InputError message={errors.description} />
                             </div>
-                            {/*<div className="space-y-2 w-1/2">*/}
-                            {/*    <Label>Assigned Person</Label>*/}
-                            {/*    <input type="hidden" name="assigned_to" value={data.assigned_to} />*/}
-                            {/*    <Select name="assigned_to" value={data.assigned_to}>*/}
-                            {/*        <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>*/}
-                            {/*        <SelectContent>*/}
-                            {/*            <SelectItem value="1">1 (Me)</SelectItem>*/}
-                            {/*        </SelectContent>*/}
-                            {/*    </Select>*/}
-                            {/*    <InputError message={errors.assigned_to} />*/}
-                            {/*</div>*/}
                             <div className="space-y-2 w-1/2">
                                 <Label>Status</Label>
                                 <input type="hidden" name="status" value={data.status} />
@@ -304,86 +281,11 @@ export default function ProjectShow({ project, tasks }: ProjectShowProps) {
                             <span className="text-sm font-bold">{tasks.progress}%</span>
                         </div>
                         <Progress value={tasks.progress} className="h-2" />
-                        {/*<div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">*/}
-                        {/*    <span>Started {project.created}</span>*/}
-                        {/*    <span>Deadline {project.deadline}</span>*/}
-                        {/*</div>*/}
                     </CardContent>
                 </Card>
 
-                {/* Tabs */}
-                <Tabs defaultValue="board" className="space-y-4">
-                    <TabsList>
-                        <TabsTrigger value="board">Board</TabsTrigger>
-                        <TabsTrigger value="list">List</TabsTrigger>
-                        {/*<TabsTrigger value="members">Members</TabsTrigger>*/}
-                        {/*<TabsTrigger value="activity">Activity</TabsTrigger>*/}
-                    </TabsList>
-
-                    {/* Board Tab */}
-                    <TabsContent value="board">
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                            {statusColumns.map((col) => {
-                                const list = tasks[col.key];
-
-                                return (
-                                    <div key={col.key} className="space-y-3">
-                                        <div className="flex items-center gap-2 px-1">
-                                            <div className={`h-2 w-2 rounded-full ${col.color}`} />
-                                            <h3 className="text-sm font-semibold">{col.title}</h3>
-                                            <span className="text-xs text-muted-foreground ml-auto">{list.length}</span>
-                                        </div>
-                                        <div className="space-y-2">
-                                            {list.length > 0 && list.map((task: TaskWithAssignee) => (
-                                                <TaskCard key={task.id}
-                                                    project_id={task.task_number}
-                                                    name={task.name}
-                                                    priority={task.priority}
-                                                    assignee={task.assignee}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </TabsContent>
-
-                    {/* List Tab */}
-                    <TabsContent value="list">
-                        <Card>
-                            <CardContent className="p-0">
-                                <div className="divide-y divide-border">
-                                    {projectTasks.map((task: TaskWithAssignee) => (
-                                        <div key={task.id} className="flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer">
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-xs text-muted-foreground font-mono w-16">{task.task_number}</span>
-                                                <span className="text-sm font-medium">{task.name}</span>
-                                                {/*<div className="flex gap-1.5">*/}
-                                                {/*    {task.labels?.map((l) => (*/}
-                                                {/*        <Badge key={l} variant="secondary" className="text-[10px] px-1.5 py-0">{l}</Badge>*/}
-                                                {/*    ))}*/}
-                                                {/*</div>*/}
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <Badge variant="secondary" className="text-[10px] capitalize">{task.priority}</Badge>
-                                                <Badge variant="outline" className="text-[10px] capitalize">{task.status === "in_progress" ? "In Progress" : task.status}</Badge>
-                                                {task.assignee && (
-                                                    <Avatar className="h-6 w-6">
-                                                        <AvatarFallback className="text-[10px] bg-primary/20 text-primary">{initials(task.assignee.name)}</AvatarFallback>
-                                                    </Avatar>
-                                                )}
-                                                <Button variant="ghost" size="icon" className="h-7 w-7">
-                                                    <MoreHorizontal className="h-3.5 w-3.5" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-                </Tabs>
+                {/*tasks display*/}
+                <ProjectTasksDisplay tasks={projectTasks} />
             </MainContent>
         </>
     )
